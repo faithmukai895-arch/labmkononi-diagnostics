@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LabTestsRouteImport } from './routes/lab-tests'
+import { Route as WellnessPackagesRouteImport } from './routes/wellness-packages'
+import { Route as LabTestsSlugRouteImport } from './routes/lab-tests.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LabTestsRoute = LabTestsRouteImport.update({
+  id: '/lab-tests',
+  path: '/lab-tests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WellnessPackagesRoute = WellnessPackagesRouteImport.update({
+  id: '/wellness-packages',
+  path: '/wellness-packages',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LabTestsSlugRoute = LabTestsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => LabTestsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/lab-tests': typeof LabTestsRouteWithChildren
+  '/wellness-packages': typeof WellnessPackagesRoute
+  '/lab-tests/$slug': typeof LabTestsSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/lab-tests': typeof LabTestsRouteWithChildren
+  '/wellness-packages': typeof WellnessPackagesRoute
+  '/lab-tests/$slug': typeof LabTestsSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/lab-tests': typeof LabTestsRouteWithChildren
+  '/wellness-packages': typeof WellnessPackagesRoute
+  '/lab-tests/$slug': typeof LabTestsSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/lab-tests' | '/wellness-packages' | '/lab-tests/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/lab-tests' | '/wellness-packages' | '/lab-tests/$slug'
+  id:
+    '__root__' | '/' | '/lab-tests' | '/wellness-packages' | '/lab-tests/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LabTestsRoute: typeof LabTestsRouteWithChildren
+  WellnessPackagesRoute: typeof WellnessPackagesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lab-tests': {
+      id: '/lab-tests'
+      path: '/lab-tests'
+      fullPath: '/lab-tests'
+      preLoaderRoute: typeof LabTestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wellness-packages': {
+      id: '/wellness-packages'
+      path: '/wellness-packages'
+      fullPath: '/wellness-packages'
+      preLoaderRoute: typeof WellnessPackagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lab-tests/$slug': {
+      id: '/lab-tests/$slug'
+      path: '/$slug'
+      fullPath: '/lab-tests/$slug'
+      preLoaderRoute: typeof LabTestsSlugRouteImport
+      parentRoute: typeof LabTestsRoute
+    }
   }
 }
 
+interface LabTestsRouteChildren {
+  LabTestsSlugRoute: typeof LabTestsSlugRoute
+}
+
+const LabTestsRouteChildren: LabTestsRouteChildren = {
+  LabTestsSlugRoute: LabTestsSlugRoute,
+}
+
+const LabTestsRouteWithChildren = LabTestsRoute._addFileChildren(
+  LabTestsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LabTestsRoute: LabTestsRouteWithChildren,
+  WellnessPackagesRoute: WellnessPackagesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
